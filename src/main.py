@@ -1,5 +1,9 @@
+from textnode import TextNode, TextType
+
+
 def main():
-    print("Hello world")
+    node = TextNode("Bold text", TextType.BOLD)
+    print(node)
 
 
 if __name__ == "__main__":

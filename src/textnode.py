@@ -1,4 +1,5 @@
 from enum import Enum
+import re
 from htmlnode import LeafNode
 
 
@@ -75,3 +76,61 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 new_nodes.append(TextNode(part, text_type))
 
     return new_nodes
+
+
+def extract_markdown_reference(text, expression):
+    matches = re.findall(expression, text)
+    output = []
+    for match in matches:
+        output.append(match)
+
+    return output
+
+
+def extract_markdown_images(text):
+    return extract_markdown_reference(text, r"!\[(.+?)\]\((.+?)\)")
+
+
+def extract_markdown_links(text):
+    return extract_markdown_reference(text, r"(?<!!)\[(.+?)\]\((.+?)\)")
+
+
+def split_nodes_reference(old_nodes, f, separator, text_type):
+    new_nodes = []
+    for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            new_nodes.append(old_node)
+            continue
+
+        text = old_node.text
+        output = f(text)
+        if len(output) == 0:
+            new_nodes.append(old_node)
+            continue
+
+        for out in output:
+            parts = text.split(separator(out), 1)
+            if parts[0]:
+                new_nodes.append(TextNode(parts[0], TextType.TEXT))
+            new_nodes.append(TextNode(out[0], text_type, out[1]))
+            text = parts[-1]
+
+        if text:
+            new_nodes.append(TextNode(text, TextType.TEXT))
+
+    return new_nodes
+
+
+def split_nodes_image(old_nodes):
+    return split_nodes_reference(
+        old_nodes,
+        extract_markdown_images,
+        lambda x: f"![{x[0]}]({x[1]})",
+        TextType.IMAGE,
+    )
+
+
+def split_nodes_link(old_nodes):
+    return split_nodes_reference(
+        old_nodes, extract_markdown_links, lambda x: f"[{x[0]}]({x[1]})", TextType.LINK
+    )

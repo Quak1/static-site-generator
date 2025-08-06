@@ -29,6 +29,11 @@ class TextNode:
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
 
 
+def text_nodes_to_html_nodes(text_nodes):
+    html_nodes = map(lambda node: text_node_to_html_node(node), text_nodes)
+    return list(html_nodes)
+
+
 def text_node_to_html_node(text_node):
     match text_node.text_type:
         case TextType.TEXT:

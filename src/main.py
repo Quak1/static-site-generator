@@ -2,7 +2,7 @@ import os
 import shutil
 
 from copy_directory import copy_directory
-from generate_page import generate_page
+from generate_page import generate_page_recursive
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
 
     copy_directory(source, dest)
 
-    generate_page("./content/index.md", "./template.html", "./public/index.html")
+    generate_page_recursive("./content", "./template.html", "./public")
 
 
 if __name__ == "__main__":

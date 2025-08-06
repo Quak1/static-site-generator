@@ -27,3 +27,17 @@ def generate_page(from_path, template_path, dest_path):
 
     with open(dest_path, "x") as f:
         f.write(page_html)
+
+
+def generate_page_recursive(dir_path_content, template_path, dest_dir_path):
+    if not os.path.exists(dir_path_content):
+        raise Exception("Source content directory doesn't exist")
+
+    for entry in os.listdir(dir_path_content):
+        source_path = os.path.join(dir_path_content, entry)
+        dest_path = os.path.join(dest_dir_path, entry)
+        if os.path.isfile(source_path):
+            dest_path = os.path.splitext(dest_path)[0] + ".html"
+            generate_page(source_path, template_path, dest_path)
+        else:
+            generate_page_recursive(source_path, template_path, dest_path)

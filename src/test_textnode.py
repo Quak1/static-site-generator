@@ -9,6 +9,7 @@ from textnode import (
     extract_markdown_links,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes,
 )
 
 
@@ -234,6 +235,30 @@ class TestExtractLinks(unittest.TestCase):
                 TextNode("link2", TextType.LINK, "example.com/2"),
             ],
             new_nodes,
+        )
+
+
+class TestTextToTextNode(unittest.TestCase):
+    def test_inline_text_types(self):
+        nodes = text_to_textnodes(
+            "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        )
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode(
+                    "obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"
+                ),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+            nodes,
         )
 
 
